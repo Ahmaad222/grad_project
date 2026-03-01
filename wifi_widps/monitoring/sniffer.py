@@ -7,7 +7,7 @@ import os
 import time
 import datetime
 
-from config import INTERFACE
+from config import INTERFACE, LOCKED_CHANNEL
 from utils import get_ssid, extract_channel
 from core.event_bus import event_queue
 
@@ -64,8 +64,21 @@ def handle_packet(packet):
 
 
 def channel_hopper():
+    import config
+
     while True:
+
+        # لو فيه channel مقفول عليه
+        if config.LOCKED_CHANNEL is not None:
+            os.system(f"iwconfig {INTERFACE} channel {config.LOCKED_CHANNEL}")
+            time.sleep(1)
+            continue
+
+        # لو مفيش lock نكمل hopping
         for ch in range(1, 14):
+            if config.LOCKED_CHANNEL is not None:
+                break
+
             os.system(f"iwconfig {INTERFACE} channel {ch}")
             time.sleep(0.4)
 
