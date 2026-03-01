@@ -11,17 +11,25 @@ class ContainmentEngine:
 
     def contain(self, bssid, clients, channel):
 
-        print(f"[Containment] Locking on channel {channel}")
+      if channel is None:
+        print("[Containment] Channel unknown.")
+        return
 
-        # 🔒 قفل القناة
-        config.LOCKED_CHANNEL = channel
-        time.sleep(1)
+    print(f"[Containment] Locking on channel {channel}")
+
+    config.LOCKED_CHANNEL = channel
+    time.sleep(1)
+
+    attack_duration = 10  # عدد الثواني اللي هنفضل نهاجم فيها
+    start_time = time.time()
+
+    while time.time() - start_time < attack_duration:
 
         for client in clients:
             self.deauth_pair(bssid, client)
 
-        # 🔓 فك القفل بعد الانتهاء
-        config.LOCKED_CHANNEL = None
+    config.LOCKED_CHANNEL = None
+    print("[Containment] Attack finished.")
 
 
     def deauth_pair(self, bssid, client):
