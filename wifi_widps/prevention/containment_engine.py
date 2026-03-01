@@ -26,14 +26,28 @@ class ContainmentEngine:
 
     def deauth_pair(self, bssid, client):
 
-        packet = RadioTap() / \
-                 Dot11(addr1=client,
-                       addr2=bssid,
-                       addr3=bssid) / \
-                 Dot11Deauth(reason=7)
+    # AP → Client
+      pkt1 = RadioTap() / \
+        Dot11(addr1=client,
+              addr2=bssid,
+              addr3=bssid) / \
+        Dot11Deauth(reason=7)
 
-        sendp(packet,
-              iface=self.iface,
-              count=DEAUTH_COUNT,
-              inter=DEAUTH_INTERVAL,
-              verbose=False)
+    # Client → AP
+      pkt2 = RadioTap() / \
+        Dot11(addr1=bssid,
+              addr2=client,
+              addr3=bssid) / \
+        Dot11Deauth(reason=7)
+
+      sendp(pkt1,
+          iface=self.iface,
+          count=DEAUTH_COUNT,
+          inter=DEAUTH_INTERVAL,
+          verbose=False)
+
+      sendp(pkt2,
+          iface=self.iface,
+          count=DEAUTH_COUNT,
+          inter=DEAUTH_INTERVAL,
+          verbose=False)
