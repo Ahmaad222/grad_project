@@ -8,7 +8,7 @@ from prevention.response_engine import ResponseEngine
 
 def main():
 
-    print("🔥 WIDPS System Started...\n")
+    print(" WIDPS System Started...\n")
 
     tm = ThreatManager()
     re = ResponseEngine()
