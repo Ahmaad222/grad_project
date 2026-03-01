@@ -30,7 +30,7 @@ def build_event(packet):
     channel = extract_channel(packet)
     signal = getattr(packet, "dBm_AntSignal", None)
 
-    clients_count = len(clients_map.get(bssid, []))
+    clients_count = len(clients_map.get(bssid, set()))
 
     return {
         "timestamp": datetime.datetime.now(),

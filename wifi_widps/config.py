@@ -8,3 +8,8 @@ TRUSTED_APS = {
         "channel": 1 ,
         "encryption": "SECURED" }
 }
+
+ENABLE_ACTIVE_CONTAINMENT = True   
+DEAUTH_COUNT = 15                # عدد الإطارات
+DEAUTH_INTERVAL = 0.1              # زمن بين الإرسال
+
